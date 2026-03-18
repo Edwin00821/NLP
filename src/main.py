@@ -3,6 +3,8 @@ import pandas as pd
 from preprocessing import TextPreprocessor
 from visualization import TextVisualizer
 from vectorization import CustomVectorizer
+from labeling import auto_label_dataset
+from classifier import SentimentClassifier
 
 
 def load_and_clean_data(data_path, preprocessor):
@@ -69,6 +71,30 @@ def run_practice_3(processed_docs, doc_ids, processed_dir):
     print("✅ Practice 3 completed!")
 
 
+def run_practice_4(data_path, labeled_dir, processed_docs, doc_ids):
+    print("\n" + "="*50)
+    print("🚀 STARTING PRACTICE 4: SENTIMENT CLASSIFIER")
+    print("="*50)
+
+    # 1. Label the dataset
+    labeled_path = os.path.join(labeled_dir, "dataset_Opiniones_labeled.csv")
+    labeled_df = auto_label_dataset(data_path, labeled_path)
+
+    # We need the labels corresponding to the document IDs we processed
+    # Assuming IDs match the index order
+    labels = labeled_df['sentimiento'].tolist()
+
+    # 2. Get the TF-IDF matrix (Reusing Practice 3 logic silently to feed the model)
+    print("\nExtracting TF-IDF features for training...")
+    vectorizer = CustomVectorizer()
+    tfidf_matrix_df = vectorizer.fit_transform_tfidf(processed_docs, doc_ids)
+
+    # 3. Train and Evaluate Model
+    classifier = SentimentClassifier()
+    classifier.train_and_evaluate(tfidf_matrix_df, labels)
+    print("\n✅ Practice 4 completed!")
+
+
 if __name__ == "__main__":
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     PROJECT_ROOT = os.path.join(BASE_DIR, "..")
@@ -77,6 +103,7 @@ if __name__ == "__main__":
                              "raw", "dataset_Opiniones.csv")
     REPORTS_DIR = os.path.join(PROJECT_ROOT, "reports")
     PROCESSED_DIR = os.path.join(PROJECT_ROOT, "data", "processed")
+    LABELED_DIR = os.path.join(PROJECT_ROOT, "data", "labeled")
 
     if not os.path.exists(DATA_PATH):
         print(f"Error: Dataset not found at {DATA_PATH}")
@@ -85,6 +112,8 @@ if __name__ == "__main__":
         print(f"Loading and processing dataset from: {DATA_PATH}")
         processed_docs, doc_ids = load_and_clean_data(DATA_PATH, preprocessor)
 
+        # Uncomment the practices you want to run!
         # run_practice_1(processed_docs, REPORTS_DIR)
         # run_practice_2(processed_docs, doc_ids, PROCESSED_DIR)
-        run_practice_3(processed_docs, doc_ids, PROCESSED_DIR)
+        # run_practice_3(processed_docs, doc_ids, PROCESSED_DIR)
+        run_practice_4(DATA_PATH, LABELED_DIR, processed_docs, doc_ids)
