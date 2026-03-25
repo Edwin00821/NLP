@@ -5,6 +5,7 @@ from visualization import TextVisualizer
 from vectorization import CustomVectorizer
 from labeling import auto_label_dataset
 from classifier import SentimentClassifier
+from embeddings import WordEmbedder
 
 
 def load_and_clean_data(data_path, preprocessor):
@@ -95,6 +96,25 @@ def run_practice_4(data_path, labeled_dir, processed_docs, doc_ids):
     print("\n✅ Practice 4 completed!")
 
 
+def run_practice_5(processed_docs, reports_dir):
+    print("\n" + "="*50)
+    print("🚀 STARTING PRACTICE 5: WORD2VEC EMBEDDINGS")
+    print("="*50)
+
+    # Initialize and train the embedder
+    # Using min_count=2 so words that appear at least twice are included in the graph
+    embedder = WordEmbedder(vector_size=100, window=5, min_count=2)
+    embedder.train_word2vec(processed_docs)
+
+    # Generate and save the distribution plot
+    print("\nGenerating vector space distribution plot...")
+    plot_path = os.path.join(reports_dir, "word2vec_distribution.png")
+
+    # Plotting top 60 words for a clear visualization without too much overlapping
+    embedder.plot_word_embeddings(plot_path, top_n=60)
+    print("\n✅ Practice 5 completed!")
+
+
 if __name__ == "__main__":
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     PROJECT_ROOT = os.path.join(BASE_DIR, "..")
@@ -116,4 +136,5 @@ if __name__ == "__main__":
         # run_practice_1(processed_docs, REPORTS_DIR)
         # run_practice_2(processed_docs, doc_ids, PROCESSED_DIR)
         # run_practice_3(processed_docs, doc_ids, PROCESSED_DIR)
-        run_practice_4(DATA_PATH, LABELED_DIR, processed_docs, doc_ids)
+        # run_practice_4(DATA_PATH, LABELED_DIR, processed_docs, doc_ids)
+        run_practice_5(processed_docs, REPORTS_DIR)
